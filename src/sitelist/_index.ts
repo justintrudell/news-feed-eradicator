@@ -14,6 +14,7 @@ const sitelist: SiteList = {
 		(await import('./substack')).default,
 		(await import('./github')).default,
 		(await import('./hackernews')).default,
+		(await import('./hckrnews')).default,
 		(await import('./abc-news-au')).default,
 	]
 }
