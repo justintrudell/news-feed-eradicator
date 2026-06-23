@@ -110,6 +110,17 @@ export const saveSnoozeUntil = (snoozeUntil: number | undefined) => setKey('snoo
 export const loadSnoozeMode = () => getKey('snoozeMode', 'hold');
 export const saveSnoozeMode = (snoozeMode: SnoozeMode) => setKey('snoozeMode', snoozeMode);
 
+// Hold-to-snooze tuning. Start delay is how long you must hold before the timer
+// begins counting; rate is how many snooze-seconds are earned per second held.
+export const DEFAULT_SNOOZE_START_DELAY_SECONDS = 5;
+export const DEFAULT_SNOOZE_RATE_PER_SECOND = 5;
+
+export const loadSnoozeStartDelaySeconds = () => getKey('snoozeStartDelaySeconds', DEFAULT_SNOOZE_START_DELAY_SECONDS);
+export const saveSnoozeStartDelaySeconds = (snoozeStartDelaySeconds: number) => setKey('snoozeStartDelaySeconds', snoozeStartDelaySeconds);
+
+export const loadSnoozeRatePerSecond = () => getKey('snoozeRatePerSecond', DEFAULT_SNOOZE_RATE_PER_SECOND);
+export const saveSnoozeRatePerSecond = (snoozeRatePerSecond: number) => setKey('snoozeRatePerSecond', snoozeRatePerSecond);
+
 export const loadSiteConfig = async (siteId: SiteId): Promise<SiteConfig | undefined> => {
 	const sites = await getKey('siteConfig', {});
 	return sites[siteId];

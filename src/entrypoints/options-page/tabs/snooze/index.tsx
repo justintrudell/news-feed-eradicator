@@ -1,7 +1,7 @@
-import type { ParentComponent } from "solid-js";
+import { Show, type ParentComponent } from "solid-js";
 import type { SnoozeMode } from "/storage/schema";
 import { useOptionsPageState } from "../../state";
-import { saveSnoozeMode } from "/storage/storage";
+import { saveSnoozeMode, DEFAULT_SNOOZE_RATE_PER_SECOND, DEFAULT_SNOOZE_START_DELAY_SECONDS } from "/storage/storage";
 import { LockedSettingsOverlay, SettingsLockFooter } from "../../lock";
 
 const SnoozeModeOption: ParentComponent<{ mode: SnoozeMode, title: string }> = ({ mode, title, children }) => {
@@ -42,6 +42,43 @@ export const SnoozeTabContent = () => {
 						Not worried about your self-control? With this option you can just hit a button to start snoozing instantly.
 					</SnoozeModeOption>
 				</ul>
+
+				<Show when={state.snoozeMode.get() === 'hold'}>
+					<div class="space-y-4 z1 blur-disabled" aria-disabled={state.settingsLockedDown()}>
+						<div class="space-y-1">
+							<label class="block font-sm">Seconds to hold before the snooze timer starts counting</label>
+							<input
+								type="number"
+								min="0"
+								step="1"
+								class="p-2 bg-darken-100 rounded"
+								style="width: 8rem"
+								disabled={state.settingsLockedDown()}
+								value={state.storage.snoozeStartDelaySeconds.get() ?? DEFAULT_SNOOZE_START_DELAY_SECONDS}
+								onChange={e => {
+									const value = Math.max(0, Math.floor(Number(e.currentTarget.value)));
+									if (Number.isFinite(value)) state.storage.setSnoozeStartDelaySeconds(value);
+								}}
+							/>
+						</div>
+						<div class="space-y-1">
+							<label class="block font-sm">Snooze seconds earned per second held</label>
+							<input
+								type="number"
+								min="1"
+								step="1"
+								class="p-2 bg-darken-100 rounded"
+								style="width: 8rem"
+								disabled={state.settingsLockedDown()}
+								value={state.storage.snoozeRatePerSecond.get() ?? DEFAULT_SNOOZE_RATE_PER_SECOND}
+								onChange={e => {
+									const value = Math.max(1, Math.floor(Number(e.currentTarget.value)));
+									if (Number.isFinite(value)) state.storage.setSnoozeRatePerSecond(value);
+								}}
+							/>
+						</div>
+					</div>
+				</Show>
 				<LockedSettingsOverlay />
 			</div>
 			<SettingsLockFooter />

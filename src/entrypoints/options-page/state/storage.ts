@@ -1,6 +1,6 @@
 import { createResource } from "solid-js";
 import { resourceObj } from "/lib/solid-util";
-import { loadRegionHideStyle, loadWidgetStyle, saveRegionHideStyle, saveWidgetStyle, loadSettingsLocked, saveSettingsLocked, loadHideQuotes, saveHideQuotes, saveNewQuoteList } from "/storage/storage";
+import { loadRegionHideStyle, loadWidgetStyle, saveRegionHideStyle, saveWidgetStyle, loadSettingsLocked, saveSettingsLocked, loadHideQuotes, saveHideQuotes, saveNewQuoteList, loadSnoozeStartDelaySeconds, saveSnoozeStartDelaySeconds, loadSnoozeRatePerSecond, saveSnoozeRatePerSecond } from "/storage/storage";
 import type { StorageLocalV2, QuoteListId } from "/storage/schema";
 import { sendToServiceWorker } from "/messaging/messages";
 
@@ -9,6 +9,8 @@ export class StorageState {
 	regionHideStyle = resourceObj(createResource(loadRegionHideStyle));
 	settingsLocked = resourceObj(createResource(loadSettingsLocked));
 	hideQuotes = resourceObj(createResource(loadHideQuotes));
+	snoozeStartDelaySeconds = resourceObj(createResource(loadSnoozeStartDelaySeconds));
+	snoozeRatePerSecond = resourceObj(createResource(loadSnoozeRatePerSecond));
 
 	async setWidgetStyle(style: StorageLocalV2['widgetStyle']) {
 		await saveWidgetStyle(style)
@@ -39,6 +41,16 @@ export class StorageState {
 		sendToServiceWorker({
 			type: 'notifyOptionsUpdated',
 		})
+	}
+
+	async setSnoozeStartDelaySeconds(seconds: number) {
+		await saveSnoozeStartDelaySeconds(seconds);
+		this.snoozeStartDelaySeconds.refetch();
+	}
+
+	async setSnoozeRatePerSecond(rate: number) {
+		await saveSnoozeRatePerSecond(rate);
+		this.snoozeRatePerSecond.refetch();
 	}
 
 	async newQuoteList(): Promise<QuoteListId> {

@@ -2,6 +2,7 @@ import { createMemo, createSignal, Show, type ParentComponent } from "solid-js";
 import { displayDuration } from "../../lib/time";
 import { useOptionsPageState } from "./state";
 import { DAY, HOUR, MINUTE } from "/lib/time";
+import { DEFAULT_SNOOZE_RATE_PER_SECOND, DEFAULT_SNOOZE_START_DELAY_SECONDS } from "/storage/storage";
 
 type SnoozePendingInfo = {
 	secondsEarned: number;
@@ -24,15 +25,16 @@ export const HoldSnoozeButton = () => {
 		const holdTime = timeHeld();
 		if (holdTime == null) return null;
 
-		if (holdTime < 5) {
-			return { secondsEarned: 0, pendingProgress: holdTime / 5 };
+		const startDelay = state.storage.snoozeStartDelaySeconds.get() ?? DEFAULT_SNOOZE_START_DELAY_SECONDS;
+		const ratePerSecond = state.storage.snoozeRatePerSecond.get() ?? DEFAULT_SNOOZE_RATE_PER_SECOND;
+
+		// Phase 1: still within the start delay — nothing earned yet, just fill the progress bar.
+		if (holdTime < startDelay) {
+			return { secondsEarned: 0, pendingProgress: startDelay > 0 ? holdTime / startDelay : 1 };
 		}
 
-		if (holdTime < 60) {
-			return { secondsEarned: 30 + Math.round((holdTime - 5) * 5), pendingProgress: 1 };
-		}
-
-		return { secondsEarned: 30 + (55 * 5) + Math.round((holdTime - 60) * 20), pendingProgress: 1 };
+		// Phase 2: past the delay — earn `ratePerSecond` snooze-seconds for every second held.
+		return { secondsEarned: Math.round((holdTime - startDelay) * ratePerSecond), pendingProgress: 1 };
 	});
 
 	const buttonDown = (e: { button: number, preventDefault: () => void }) => {

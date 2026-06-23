@@ -19,6 +19,8 @@ export type StorageLocalV2 = {
 	quoteLists?: QuoteList[];
 	widgetStyle?: 'contained' | 'transparent';
 	regionHideStyle?: 'blur' | 'hidden';
+	snoozeStartDelaySeconds?: number;
+	snoozeRatePerSecond?: number;
 };
 
 export type QuoteList = {
